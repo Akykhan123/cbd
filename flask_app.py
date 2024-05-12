@@ -1,24 +1,23 @@
-import streamlit as st
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 
-# Define your function to generate responses
-def get_response(message):
-    # Your logic for generating responses goes here
-    return "This is a generated response to: " + message
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# Define your Streamlit app
-def main():
-    st.title("Capital Rent a Car Chatbot")
-    
-    # Get user input
-    message = st.text_input("Enter your message here:")
-    
-    # Check if user submitted a message
-    if message:
-        # Generate response
-        response = get_response(message)
-        # Display response
-        st.write("Response:", response)
+@app.route('/')
+def index():
+    return render_template('Website.html')
 
-# Run the Streamlit app
+@app.route("/predict", methods=["POST"])
+def predict():
+    data = request.get_json()
+    text = data.get("message")
+    print("Received message:", text)  # Check if the message is received correctly
+    response = get_response(text)  # Assuming get_response is defined elsewhere
+    print("Generated response:", response)  # Check the generated response
+    message = {"answer": response}
+    return jsonify(message)
+
+
 if __name__ == "__main__":
-    main()
+    app.run(host='0.0.0.0', port=8080)
